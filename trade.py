@@ -7,7 +7,18 @@ from vnstock import Vnstock
 from datetime import datetime, timedelta
 import warnings
 import calendar
+# ====================== VNSTOCK API KEY ======================
+# Thay key của bạn vào đây (key bạn đã có từ trước: vnstock_9008899a9dce77c13e296b6442ee866c)
+VNSTOCK_API_KEY = "vnstock_9008899a9dce77c13e296b6442ee866c"
 
+from vnstock import register_user
+
+# Đăng ký key (chỉ cần chạy 1 lần khi deploy)
+try:
+    register_user(api_key=VNSTOCK_API_KEY)
+    print("✅ Đã đăng ký vnstock API key thành công")
+except Exception as e:
+    print(f"⚠️ Không đăng ký được key: {e}")
 warnings.filterwarnings('ignore')
 
 st.set_page_config(page_title="Multi-View Trade Analyzer", layout="wide")
@@ -285,7 +296,17 @@ if st.sidebar.button("🚀 Chạy phân tích Multi-View", type="primary"):
 
         for symbol in selected_stocks:
             try:
-                stock = Vnstock().stock(symbol=symbol, source='VCI')
+                #stock = Vnstock().stock(symbol=symbol, source='VCI')
+                try:
+                    # Cách an toàn nhất hiện nay
+                    df = Vnstock().stock(symbol=symbol).quote.history(
+                        start=start_date, 
+                        end=end_date, 
+                        interval="1D"
+                    )
+                except:
+                    # Fallback nếu vẫn lỗi
+                    df = None
                 end_date = datetime.now().strftime("%Y-%m-%d")
                 start_date = (datetime.now() - timedelta(days=130)).strftime("%Y-%m-%d")
 

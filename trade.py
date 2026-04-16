@@ -12,7 +12,6 @@ warnings.filterwarnings('ignore')
 
 # ====================== VNSTOCK API KEY ======================
 VNSTOCK_API_KEY = "vnstock_9008899a9dce77c13e296b6442ee866c"
-
 try:
     register_user(api_key=VNSTOCK_API_KEY)
     st.success("✅ Đã đăng ký vnstock API key", icon="🔑")
@@ -25,44 +24,31 @@ st.markdown("**Kế hoạch trade 5-7 ngày | Target +4% | Stop -3% | Ngân sác
 
 # ====================== DICTIONARY NGÀNH NGHỀ ======================
 SECTOR_MAP = {
-    "ACB": "Ngân hàng", "BID": "Ngân hàng", "VCB": "Ngân hàng", "CTG": "Ngân hàng", 
+    "ACB": "Ngân hàng", "BID": "Ngân hàng", "VCB": "Ngân hàng", "CTG": "Ngân hàng",
     "HDB": "Ngân hàng", "MBB": "Ngân hàng", "SHB": "Ngân hàng", "STB": "Ngân hàng",
     "TCB": "Ngân hàng", "TPB": "Ngân hàng", "VPB": "Ngân hàng", "LPB": "Ngân hàng",
     "OCB": "Ngân hàng", "VIB": "Ngân hàng",
-
     "HPG": "Thép - Vật liệu xây dựng", "HSG": "Thép", "NKG": "Thép",
-    "VHM": "Bất động sản", "VIC": "Bất động sản", "NVL": "Bất động sản", 
+    "VHM": "Bất động sản", "VIC": "Bất động sản", "NVL": "Bất động sản",
     "PDR": "Bất động sản", "KBC": "Bất động sản", "DIG": "Bất động sản",
     "VRE": "Bất động sản", "DXG": "Bất động sản",
-
     "FPT": "Công nghệ - Thông tin", "MWG": "Bán lẻ", "PNJ": "Bán lẻ",
     "FRT": "Bán lẻ", "DGW": "Bán lẻ",
-
     "MSN": "Thực phẩm - Đồ uống", "VNM": "Sữa - Thực phẩm", "SAB": "Đồ uống",
     "QNS": "Đường", "SBT": "Đường", "LSS": "Đường",
-
     "POW": "Điện lực", "GAS": "Khí đốt", "PLX": "Xăng dầu",
     "VJC": "Hàng không", "TCH": "Ô tô - Linh kiện",
-
     "SSI": "Chứng khoán", "VCI": "Chứng khoán",
-
     "GEX": "Vật liệu xây dựng", "DGC": "Hóa chất", "DPM": "Phân bón",
     "DCM": "Phân bón", "BFC": "Phân bón",
-
     "ANV": "Thủy sản", "VHC": "Thủy sản",
-
     "REE": "Điện lạnh - Cơ điện", "GEG": "Điện", "PC1": "Xây dựng",
-
     "KDH": "Bất động sản", "NLG": "Bất động sản", "TTA": "Bất động sản",
     "HDG": "Bất động sản", "BCG": "Bất động sản",
-
     "SAM": "Dệt may", "TNG": "Dệt may", "VGT": "Dệt may",
-
     "PET": "Nhựa - Hóa chất", "CSV": "Nhựa", "LAS": "Nhựa",
-
     "PVS": "Dầu khí", "PVD": "Dầu khí", "PVT": "Vận tải biển",
     "HAH": "Vận tải", "VOS": "Vận tải",
-
     "SCS": "Logistics", "VSC": "Vận tải",
     "EIB": "Ngân hàng",
     "HHV": "Xây dựng - Hạ tầng",
@@ -93,127 +79,126 @@ SECTOR_MAP = {
 def get_sector(symbol):
     return SECTOR_MAP.get(symbol, "Khác / Chưa phân loại")
 
-# ====================== TRỌNG SỐ & HÀM CHẤM ĐIỂM ======================
+# ====================== TRỌNG SỐ ======================
 WEIGHTS = {
-    'Momentum': 0.30, 'Trend': 0.22, 'Volume': 0.18,
-    'Oscillator': 0.15, 'Volatility': 0.08, 'PriceAction': 0.07
+    'Momentum': 0.30,
+    'Trend': 0.22,
+    'Volume': 0.18,
+    'Oscillator': 0.15,
+    'Volatility': 0.08,
+    'PriceAction': 0.07
 }
 
-# (Giữ nguyên 6 hàm score_momentum, score_trend, score_oscillator, score_volume, score_volatility, score_price_action như file cũ của bạn)
-# ====================== HÀM CHẤM ĐIỂM (0-10) ======================
-def score_momentum(crsi, price_vs_hvn):
-    if crsi > 68 and price_vs_hvn == "above_hvn": return 9.5
-    elif crsi > 55 and price_vs_hvn in ["near_hvn", "above_hvn"]: return 8.0
-    elif 45 <= crsi <= 55: return 6.5
-    else: return 4.0
+# ====================== HÀM CHẤM ĐIỂM ĐÃ TỐI ƯU ======================
+def score_momentum(crsi):
+    if crsi > 68: return 9.5
+    elif crsi > 58: return 8.2
+    elif crsi > 52: return 7.0
+    elif crsi < 45: return 3.8
+    else: return 5.5
 
-def score_trend(price, ma20_series, ma50_series):
-    ma20 = ma20_series.iloc[-1]
-    ma50 = ma50_series.iloc[-1]
-    ma20_prev = ma20_series.iloc[-2] if len(ma20_series) > 1 else ma20
-    if price > ma20 > ma50 and ma20 > ma20_prev:
-        return 9.5
-    elif price > ma20 > ma50:
-        return 7.8
-    elif ma20 > price > ma50:
-        return 5.5
-    elif ma20 > ma50:
-        return 4.5
-    else:
-        return 3.0
+def score_trend(price, ma20, ma50):
+    if price > ma20 > ma50: return 9.2
+    elif ma20 > ma50: return 7.0
+    elif price > ma20: return 5.5
+    else: return 3.5
 
 def score_oscillator(rsi, stoch):
     if 48 <= rsi <= 68 and stoch > 55: return 9.0
-    elif 40 <= rsi <= 72 and stoch > 40: return 7.0
-    elif rsi > 72 or rsi < 35 or stoch < 20: return 4.0
+    elif 40 <= rsi <= 72: return 7.0
+    elif rsi > 72 or rsi < 35: return 4.0
     else: return 5.5
 
-def score_volume(obv_trend, volume_increase):
-    if obv_trend == "up" and volume_increase: return 9.5
-    elif obv_trend == "flat" and volume_increase: return 7.5
-    elif obv_trend == "up": return 6.5
-    elif obv_trend == "down": return 4.0
+def score_volume(obv_trend, vol_ratio):
+    if obv_trend == "up" and vol_ratio > 1.5: return 9.5
+    elif obv_trend == "up" and vol_ratio > 1.25: return 8.0
+    elif obv_trend == "up": return 6.8
+    elif obv_trend == "flat" and vol_ratio > 1.2: return 6.0
+    elif obv_trend == "down": return 3.8
+    elif vol_ratio < 0.85: return 4.0
     else: return 5.5
 
-def score_volatility(bb_status, band_width):
-    if bb_status == "squeeze" and band_width < 0.08: return 9.0
-    elif bb_status == "normal": return 6.5
-    elif bb_status == "expansion": return 5.0
-    else: return 4.0
+def score_volatility(band_width):
+    if band_width < 0.08: return 8.5
+    elif band_width > 0.18: return 4.5
+    else: return 6.5
 
-def score_price_action(pa_signal, near_support):
-    if pa_signal == "strong_bounce" and near_support: return 9.5
-    elif pa_signal in ["hammer", "engulfing"] and near_support: return 8.0
-    elif pa_signal == "neutral" and near_support: return 6.0
-    elif pa_signal == "neutral": return 5.5
-    else: return 3.5
-# ====================== CALCULATE VIEW SCORES (ĐÃ SỬA) ======================
+def score_price_action(current_price, support, df):
+    """PriceAction đã tối ưu - không còn kẹt ở 3.5"""
+    if len(df) < 5:
+        return 5.0
+    
+    distance = (current_price - support) / support
+    
+    # Giá bật mạnh khỏi support
+    if distance > 0.018 and df['low'].iloc[-1] <= support * 1.008:
+        return 9.2
+    
+    # Giá đang test support và bật lên
+    if 0.005 < distance <= 0.018:
+        return 7.8
+    
+    # Giá đang nằm sát hoặc dưới support
+    if distance <= 0.005:
+        if df['close'].iloc[-1] > df['open'].iloc[-1]:  # nến xanh
+            return 6.0
+        else:
+            return 3.8  # nến đỏ gần support = nguy hiểm
+    
+    # Giá xa support quá (không có price action rõ)
+    return 4.5
+
+# ====================== CALCULATE VIEW SCORES ======================
 def calculate_view_scores(df, current_price, support):
     scores = {}
     try:
         ma20 = df['close'].rolling(20).mean()
         ma50 = df['close'].rolling(50).mean()
-
+        
         rsi = ta.rsi(df['close'], length=14).iloc[-1] if len(df) > 14 else 50.0
-        stoch = ta.stoch(df['high'], df['low'], df['close'])
-        stoch_k = stoch['STOCHk_14_3_3'].iloc[-1] if not stoch.empty and 'STOCHk_14_3_3' in stoch.columns else 50.0
-
+        stoch_df = ta.stoch(df['high'], df['low'], df['close'])
+        stoch_k = stoch_df['STOCHk_14_3_3'].iloc[-1] if not stoch_df.empty else 50.0
+        
         obv = ta.obv(df['close'], df['volume'])
         obv_trend = "up" if obv.diff().iloc[-1] > 0 else "down" if obv.diff().iloc[-1] < 0 else "flat"
+        
         vol_ratio = df['volume'].iloc[-1] / df['volume'].rolling(20).mean().iloc[-1] if len(df) > 20 else 1.0
-        volume_increase = vol_ratio > 1.25
-
+        
         crsi = ta.crsi(df['close'], df['high'], df['low'], length=3, fast=2, slow=100).iloc[-1] if len(df) > 100 else 50.0
-
+        
         bb = ta.bbands(df['close'], length=20, std=2)
-        if not bb.empty and 'BBU_20_2.0' in bb.columns:
-            band_width = (bb['BBU_20_2.0'].iloc[-1] - bb['BBL_20_2.0'].iloc[-1]) / current_price
-            bb_status = "squeeze" if band_width < 0.08 else "normal"
-        else:
-            band_width = 0.1
-            bb_status = "normal"
+        band_width = (bb['BBU_20_2.0'].iloc[-1] - bb['BBL_20_2.0'].iloc[-1]) / current_price if not bb.empty else 0.12
 
-        price_vs_hvn = "near_hvn"
-        pa_signal = "strong_bounce" if current_price > support * 1.015 else "neutral"
-        near_support = current_price <= support * 1.02
-
-    except Exception as e:
-        st.warning(f"Lỗi tính indicator cho {symbol}: {str(e)[:80]}")
-        crsi = rsi = stoch_k = 50.0
+    except:
+        rsi = stoch_k = crsi = 50.0
         obv_trend = "flat"
-        volume_increase = False
-        bb_status = "normal"
-        band_width = 0.1
-        price_vs_hvn = "near_hvn"
-        pa_signal = "neutral"
-        near_support = True
+        vol_ratio = 1.0
+        band_width = 0.12
 
-    scores['Momentum']   = score_momentum(crsi, price_vs_hvn)
-    scores['Trend']      = score_trend(current_price, ma20, ma50)
+    scores['Momentum'] = score_momentum(crsi)
+    scores['Trend'] = score_trend(current_price, ma20.iloc[-1], ma50.iloc[-1])
     scores['Oscillator'] = score_oscillator(rsi, stoch_k)
-    scores['Volume']     = score_volume(obv_trend, volume_increase)
-    scores['Volatility'] = score_volatility(bb_status, band_width)
-    scores['PriceAction']= score_price_action(pa_signal, near_support)
+    scores['Volume'] = score_volume(obv_trend, vol_ratio)
+    scores['Volatility'] = score_volatility(band_width)
+    scores['PriceAction'] = score_price_action(current_price, support, df)
 
     return scores
 
 # ====================== WEIGHTED SCORE ======================
 def calculate_weighted_score(scores_dict):
-    weighted_score = sum(scores_dict.get(view, 5.0) * weight for view, weight in WEIGHTS.items())
+    weighted = sum(scores_dict.get(view, 5.0) * weight for view, weight in WEIGHTS.items())
+    
+    strong = sum(1 for v in scores_dict.values() if v >= 7.5)
+    if strong >= 5: weighted += 1.2
+    elif strong >= 4: weighted += 0.8
+    
+    if scores_dict.get('Momentum', 0) >= 8.0 and scores_dict.get('Volume', 0) >= 7.5:
+        weighted += 1.1
+    
+    weak = sum(1 for v in scores_dict.values() if v <= 4.0)
+    if weak >= 3: weighted -= 0.8
 
-    strong_views = sum(1 for s in scores_dict.values() if s >= 7.0)
-    if strong_views >= 5: weighted_score += 1.2
-    elif strong_views >= 4: weighted_score += 0.8
-    elif strong_views >= 3: weighted_score += 0.4
-
-    mom = scores_dict.get('Momentum', 0)
-    vol = scores_dict.get('Volume', 0)
-    if mom >= 8.0 and vol >= 8.0: weighted_score += 1.1
-
-    weak_views = sum(1 for s in scores_dict.values() if s <= 4.5)
-    if weak_views >= 3: weighted_score -= 0.7
-
-    return round(min(max(weighted_score, 3.0), 10.0), 2)
+    return round(min(max(weighted, 3.0), 10.5), 2)
 
 # ====================== FIBONACCI & MARKET CONTEXT ======================
 def calculate_fibonacci(df):

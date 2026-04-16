@@ -83,7 +83,7 @@ def get_sector(symbol):
 WEIGHTS = {
     'Momentum': 0.28, 'Trend': 0.20, 'Volume': 0.18,
     'Oscillator': 0.14, 'Volatility': 0.07, 'PriceAction': 0.07,
-    'Ichimoku': 0.06   
+    'Ichimoku': 0.06 } 
 
 # ====================== HÀM CHẤM ĐIỂM ĐÃ TỐI ƯU ======================
 def score_ichimoku(price, cloud_top, cloud_bottom, chikou, tenkan, kijun):

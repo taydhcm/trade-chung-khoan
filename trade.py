@@ -81,15 +81,26 @@ def get_sector(symbol):
 
 # ====================== TRỌNG SỐ ======================
 WEIGHTS = {
-    'Momentum': 0.30,
-    'Trend': 0.22,
-    'Volume': 0.18,
-    'Oscillator': 0.15,
-    'Volatility': 0.08,
-    'PriceAction': 0.07
-}
+    'Momentum': 0.28, 'Trend': 0.20, 'Volume': 0.18,
+    'Oscillator': 0.14, 'Volatility': 0.07, 'PriceAction': 0.07,
+    'Ichimoku': 0.06   
 
 # ====================== HÀM CHẤM ĐIỂM ĐÃ TỐI ƯU ======================
+def score_ichimoku(price, cloud_top, cloud_bottom, chikou, tenkan, kijun):
+    """Score Ichimoku 0-10"""
+    # Giá trên đám mây + Chikou trên giá = Bullish mạnh
+    if price > cloud_top and chikou > price:
+        return 9.2
+    # Giá trên đám mây
+    elif price > cloud_top:
+        return 7.8
+    # Giá dưới đám mây
+    elif price < cloud_bottom:
+        return 3.5
+    # Giá trong đám mây (sideway)
+    else:
+        return 5.0
+        
 def score_momentum(crsi):
     if crsi > 68: return 9.5
     elif crsi > 58: return 8.2
@@ -169,6 +180,12 @@ def calculate_view_scores(df, current_price, support):
         bb = ta.bbands(df['close'], length=20, std=2)
         band_width = (bb['BBU_20_2.0'].iloc[-1] - bb['BBL_20_2.0'].iloc[-1]) / current_price if not bb.empty else 0.12
 
+        # === ICHIMOKU ===
+        ichi = ta.ichimoku(df['high'], df['low'], df['close'])
+        cloud_top = ichi[0]['ISA_9'].iloc[-1]      # Senkou Span A
+        cloud_bottom = ichi[0]['ISB_26'].iloc[-1]  # Senkou Span B
+        chikou = ichi[1]['chikou'].iloc[-1] if 'chikou' in ichi[1].columns else df['close'].iloc[-1]
+        
     except:
         rsi = stoch_k = crsi = 50.0
         obv_trend = "flat"
@@ -181,6 +198,10 @@ def calculate_view_scores(df, current_price, support):
     scores['Volume'] = score_volume(obv_trend, vol_ratio)
     scores['Volatility'] = score_volatility(band_width)
     scores['PriceAction'] = score_price_action(current_price, support, df)
+    scores['Ichimoku'] = score_ichimoku(
+            current_price, cloud_top, cloud_bottom, chikou, 
+            ichi[0]['TENKAN_9'].iloc[-1], ichi[0]['KIJUN_26'].iloc[-1]
+        )
 
     return scores
 
@@ -321,9 +342,9 @@ if st.sidebar.button("🚀 Chạy phân tích Multi-View", type="primary"):
                     'Volume': round(view_scores.get('Volume',0),1),
                     'Volatility': round(view_scores.get('Volatility',0),1),
                     'PriceAction': round(view_scores.get('PriceAction',0),1),
+                    'Ichimoku': round(view_scores.get('Ichimoku',0),1),
                     'Tech Score': tech_score,
                     'Final Score': final_score,
-                    'Gần đáo hạn PS': exp_text,
                     'Ngành nghề': get_sector(symbol),
                     'Khuyến nghị': 'MUA MẠNH' if final_score >= 8.5 else 'MUA' if final_score >= 7.2 else 'THEO DÕI'
                 })

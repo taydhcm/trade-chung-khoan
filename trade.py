@@ -248,7 +248,7 @@ def get_market_context():
 
 # ====================== GIAO DIỆN & LOGIC CHẠY ======================
 st.sidebar.header("⚙️ Cài đặt phân tích")
-manual_stocks = ["HPG", "FPT", "TCB", "SSI", "STB", "VND", "MWG", "MBB", "VHM", "VIC", "VPB", "DIG", "NVL", "GEX", "VCI", "MSN", "VNM", "ACB", "CTG", "SHB", "HDB", "VIX", "KBC", "PDR", "DXG", "VCB", "DGC", "TPB", "HSG", "NKG", "VRE", "EIB", "POW", "GAS", "LPB", "TCH", "VJC", "BID", "PLX", "SAB", "BVH", "REE", "PNJ", "GVR", "FRT", "FTS", "CTS", "BSI", "VHC", "ANV", "IDC", "KDH", "NLG", "DBC", "PVS", "PVD", "SCS", "VOS", "PVT", "HAH", "DCM", "DPM", "PC1", "GEG", "VGT", "TNG", "MSB", "OCB", "VIB", "BAB", "TTA", "BCG", "HDG", "SAM", "AAA", "PHR", "SZC", "VPI", "CII", "HHV", "LCG", "VCG", "LSS", "SBT", "QNS", "MIG", "GIL", "VNA", "SKG", "VSC"]
+manual_stocks = ["HPG", "BSR", "FPT", "TCB", "SSI", "STB", "VND", "MWG", "MBB", "VHM", "VIC", "VPB", "DIG", "NVL", "GEX", "VCI", "MSN", "VNM", "ACB", "CTG", "SHB", "HDB", "VIX", "KBC", "PDR", "DXG", "VCB", "DGC", "TPB", "HSG", "NKG", "VRE", "EIB", "POW", "GAS", "LPB", "TCH", "VJC", "BID", "PLX", "SAB", "BVH", "REE", "PNJ", "GVR", "FRT", "FTS", "CTS", "BSI", "VHC", "ANV", "IDC", "KDH", "NLG", "DBC", "PVS", "PVD", "SCS", "VOS", "PVT", "HAH", "DCM", "DPM", "PC1", "GEG", "VGT", "TNG", "MSB", "OCB", "VIB", "BAB", "TTA", "BCG", "HDG", "SAM", "AAA", "PHR", "SZC", "VPI", "CII", "HHV", "LCG", "VCG", "LSS", "SBT", "QNS", "MIG", "GIL", "VNA", "SKG", "VSC"]
 
 selection_mode = st.sidebar.radio(
     "Chế độ chọn cổ phiếu",

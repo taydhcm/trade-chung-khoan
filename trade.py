@@ -73,7 +73,7 @@ SECTOR_MAP = {
     "PHR": "Cao su",
     "LCG": "Xây dựng - Hạ tầng",
     "AAA": "Nhựa - Hóa chất",
-    "VNA": "Hàng không",
+    "BSR": "Dầu khí",
 }
 
 def get_sector(symbol):
